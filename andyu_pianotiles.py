@@ -4,7 +4,7 @@ import random
 import pickle
 
 
-# window setup
+#turtle window setup
 wn = turtle.Screen()
 wn.title("Piano Tiles")
 wn.bgcolor("white")
@@ -50,6 +50,16 @@ class Tile(turtle.Turtle):
         self.color("black")
 
 
+# scoreboard
+scoreboard = turtle.Turtle()
+scoreboard.hideturtle()
+scoreboard.color("red")
+scoreboard.speed(0)
+scoreboard.penup()
+scoreboard.goto(0, 350)
+scoreboard.write(f"Score: {score} Lives: {int(lives)}", align = "center", font = font)
+
+
 # grids
 grid1 = Grid(-100, 0)
 grid2 = Grid(0, 0)
@@ -76,89 +86,46 @@ tile4 = Tile(300)
 tiles = [tile1, tile2, tile3, tile4]
 
 
-# scoreboard
-scoreboard = turtle.Turtle()
-scoreboard.hideturtle()
-scoreboard.color("red")
-scoreboard.speed(0)
-scoreboard.penup()
-scoreboard.goto(0, 350)
-
-
 # functions
+def update_scoreboard():
+    scoreboard.clear()
+    scoreboard.write(f"Score: {score} Lives: {int(lives)}", align = "center", font = font)
+
 def move_down():
     for tile in tiles:
         tile.sety(tile.ycor() - 200)
 
-def move_q():
+def move(key):
     global score
     global lives
     for tile in tiles:
-        if tile.pos() == q:
+        if tile.pos() == key:
             score += 10
             tile.goto(random.choice(possible_x), 300)
             tiles.remove(tile)
             move_down()
             tiles.append(tile)
+            update_scoreboard()
+            break
         else:
-            lives -= 1
-
-def move_w():
-    global score
-    global lives
-    for tile in tiles:
-        if tile.pos() == w:
-            score += 10
-            tile.goto(random.choice(possible_x), 300)
-            tiles.remove(tile)
-            move_down()
-            tiles.append(tile)
-        else:
-            lives -= 1
-
-def move_e():
-    global score
-    global lives
-    for tile in tiles:
-        if tile.pos() == e:
-            score += 10
-            tile.goto(random.choice(possible_x), 300)
-            tiles.remove(tile)
-            move_down()
-            tiles.append(tile)
-        else:
-            lives -= 1
-
-def move_r():
-    global score
-    global lives
-    for tile in tiles:
-        if tile.pos() == r:
-            score += 10
-            tile.goto(random.choice(possible_x), 300)
-            tiles.remove(tile)
-            move_down()
-            tiles.append(tile)
-        else:
-            lives -= 1
-
-# def move(key):
-    # print(key)
-    # if title.pos() == key:
-        # pass
+            lives -= 0.25
+            update_scoreboard()
+    wn.update()
 
 
 # keybinding
 wn.listen()
-wn.onkeypress(move_q, "q")
-wn.onkeypress(move_w, "w")
-wn.onkeypress(move_e, "e")
-wn.onkeypress(move_r, "r")
-#wn.onkeypress(lambda: move("q"), "q")
+wn.onkeypress((lambda:move(q)), "q")
+wn.onkeypress((lambda:move(w)), "w")
+wn.onkeypress((lambda:move(e)), "e")
+wn.onkeypress((lambda:move(r)), "r")
 
+
+# check life
+if lives == 0:
+    pickle.dump(score, open("highscore.dat", "wb"))
+    
 
 # mainloop
-while True:
-    wn.update()
-    scoreboard.clear()
-    scoreboard.write(f"Score: {score} Lives: {lives}", align = "center", font = font)
+wn.update()
+wn.mainloop()

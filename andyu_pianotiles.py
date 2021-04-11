@@ -136,8 +136,8 @@ wn.onkeypress((lambda:move(r)), "r")
 def game_over():
     if lives == 0.0:
         pickle.dump(score, open("highscore.dat", "wb"))
-        open_splashscreen()
         wn.bye()
+        open_splashscreen()
 
 
 # mainloop

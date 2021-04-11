@@ -14,9 +14,12 @@ wn.tracer(0)
 
 
 # turtle splashscreen setup
-root = tk.Tk()
-root.title("Piano Tiles")
-root.geometry("410x800")
+def open_splashscreen():
+    root = tk.Tk()
+    root.title("Piano Tiles")
+    root.geometry("410x800")
+    
+    root.mainloop()
 
 
 # initial stuff
@@ -116,6 +119,7 @@ def move(key):
             break
         else:
             lives -= 0.25
+            game_over()
             update_scoreboard()
     wn.update()
 
@@ -129,11 +133,13 @@ wn.onkeypress((lambda:move(r)), "r")
 
 
 # check life
-if lives == 0:
-    pickle.dump(score, open("highscore.dat", "wb"))
-    
+def game_over():
+    if lives == 0.0:
+        pickle.dump(score, open("highscore.dat", "wb"))
+        open_splashscreen()
+        wn.bye()
+
 
 # mainloop
 wn.update()
-root.mainloop()
 wn.mainloop()

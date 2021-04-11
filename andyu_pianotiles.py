@@ -1,15 +1,22 @@
 # imports
+import tkinter as tk
 import turtle
 import random
 import pickle
 
 
-#turtle window setup
+# turtle game window setup
 wn = turtle.Screen()
 wn.title("Piano Tiles")
 wn.bgcolor("white")
 wn.setup(410,800)
 wn.tracer(0)
+
+
+# turtle splashscreen setup
+root = tk.Tk()
+root.title("Piano Tiles")
+root.geometry("410x800")
 
 
 # initial stuff
@@ -128,4 +135,5 @@ if lives == 0:
 
 # mainloop
 wn.update()
+root.mainloop()
 wn.mainloop()

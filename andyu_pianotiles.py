@@ -19,6 +19,18 @@ def open_splashscreen():
     root.title("Piano Tiles")
     root.geometry("410x800")
     
+    # functions
+    
+    
+    # widgets
+    label_title = tk.Label(root, text = "Piano Tiles", font = ("Arial", 30))
+    label_title.pack()
+    
+    label_highscore = tk.Label(root, text = f"Highest Score: {pickle.load(open('highscore.dat', 'rb'))}", font = ("Arial", 25))
+    label_highscore.pack()
+    
+    
+    
     root.mainloop()
 
 

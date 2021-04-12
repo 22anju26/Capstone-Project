@@ -75,6 +75,7 @@ def game():
             self.shape("square")
             self.shapesize(10, 5, 0.1)
             self.color("black")
+            self.speed(0)
 
 
     # scoreboard

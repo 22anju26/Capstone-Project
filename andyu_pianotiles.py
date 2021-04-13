@@ -39,7 +39,7 @@ def game():
     wn.bgcolor("white")
     wn.setup(410,800)
     wn.tracer(0)
-
+    
 
     # initial stuff
     font = ("Calibri", 20, "bold")
@@ -59,6 +59,7 @@ def game():
             self.goto(x, y)
             self.shape("square")
             self.color("grey")
+            self.speed(0)
 
         def vertical(self):
             self.shapesize(400, 0.1, 0.1)
@@ -103,26 +104,26 @@ def game():
     horizontal_grids = (grid4, grid5, grid6, grid7)
     for grid in horizontal_grids:
         grid.horizontal()
-
-
+    
+    
     # tiles
     tile1 = Tile(-300)
     tile2 = Tile(-100)
     tile3 = Tile(100)
     tile4 = Tile(300)
-
+    
     tiles = [tile1, tile2, tile3, tile4]
-
-
+    
+    
     # functions
     def update_scoreboard():
         scoreboard.clear()
         scoreboard.write(f"Score: {score} Lives: {int(lives)}", align = "center", font = font)
-
+    
     def move_down():
         for tile in tiles:
             tile.sety(tile.ycor() - 200)
-
+    
     def move(key):
         global score
         global lives
@@ -140,34 +141,30 @@ def game():
                 game_over()
                 update_scoreboard()
         wn.update()
-
-
+    
+    
     # keybinding
     wn.listen()
     wn.onkeypress((lambda:move(q)), "q")
     wn.onkeypress((lambda:move(w)), "w")
     wn.onkeypress((lambda:move(e)), "e")
     wn.onkeypress((lambda:move(r)), "r")
-
-
+    
+    
     # check life
     def game_over():
         global score
         global lives
+        
         if lives == 0.0:
             if score > pickle.load(open("highscore.dat", "rb")):
                 pickle.dump(score, open("highscore.dat", "wb"))
-                score = 0
-                lives = 5
-                wn.bye()
-                open_splashscreen()
-            else:
-                score = 0
-                lives = 5
-                wn.bye()
-                open_splashscreen()
-
-
+            score = 0
+            lives = 5
+            wn.bye()
+            open_splashscreen()
+    
+    
     # mainloop
     wn.update()
     wn.mainloop()

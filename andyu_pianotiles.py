@@ -1,96 +1,77 @@
 # imports
-import tkinter as tk
 import turtle
 import random
 import pickle
 
+# turtle game window setup
+wn = turtle.Screen()
+wn.title("Piano Tiles")
+wn.bgcolor("white")
+wn.setup(410,800)
+wn.tracer(0)
 
-# turtle splashscreen setup
-def open_splashscreen():
-    root = tk.Tk()
-    root.title("Piano Tiles")
-    root.geometry("410x800")
-    
-    # functions
-    def play_game():
-        root.destroy()
-        game()
 
-    # widgets
-    label_title = tk.Label(root, text = "Piano Tiles", font = ("Arial", 30))
-    label_title.pack()
-    
-    label_highscore = tk.Label(root, text = f"Highest Score: {pickle.load(open('highscore.dat', 'rb'))}", font = ("Arial", 25))
-    label_highscore.pack()
-    
-    button_play = tk.Button(root, text = "Play Game", command = play_game, width = 10)
-    button_play.pack()
-    
-    
-    root.mainloop()
-
+# initial stuff
+possible_x = (-150, -50, 50, 150)
+possible_y = (-300, -100, 100, 300)
+q = -150, -300
+w = -50, -300
+e = 50, -300
+r = 150, -300
 score = 0
 lives = 5
 
-def game():
-    # turtle game window setup
-    wn = turtle.Screen()
-    wn.title("Piano Tiles")
-    wn.bgcolor("white")
-    wn.setup(410,800)
-    wn.tracer(0)
+
+# class
+class Grid(turtle.Turtle):
+    def __init__(self, x, y):
+        turtle.Turtle.__init__(self)
+        self.penup()
+        self.goto(x, y)
+        self.shape("square")
+        self.color("grey")
+        self.speed(0)
+
+    def vertical(self):
+        self.shapesize(400, 0.1, 0.1)
     
+    def horizontal(self):
+        self.shapesize(0.1, 400, 0.1)
 
-    # initial stuff
-    font = ("Calibri", 20, "bold")
-    possible_x = (-150, -50, 50, 150)
-    possible_y = (-300, -100, 100, 300)
-    q = -150, -300
-    w = -50, -300
-    e = 50, -300
-    r = 150, -300
+class Tile(turtle.Turtle):
+    def __init__(self, y):
+        turtle.Turtle.__init__(self)
+        self.penup()
+        self.goto(random.choice(possible_x), y)
+        self.shape("square")
+        self.shapesize(10, 5, 0.1)
+        self.color("black")
+        self.speed(0)
+    
+    def reset(self):
+        self.goto(random.choice(possible_x), y)
 
-
-    # class
-    class Grid(turtle.Turtle):
-        def __init__(self, x, y):
-            turtle.Turtle.__init__(self)
-            self.penup()
-            self.goto(x, y)
-            self.shape("square")
-            self.color("grey")
-            self.speed(0)
-
-        def vertical(self):
-            self.shapesize(400, 0.1, 0.1)
+class Text(turtle.Turtle):
+    def __init__(self, color, x, y, text, size):
+        turtle.Turtle.__init__(self)
+        font = ("Calibri", size, "bold")
+        self.hideturtle()
+        self.color(color)
+        self.speed(0)
+        self.penup()
+        self.goto(x, y)
+        self.write(text, align = "center", font = font)
         
-        def horizontal(self):
-            self.shapesize(0.1, 400, 0.1)
+    def updatetext(self, new_text, size):
+        font = ("Calibri", size, "bold")
+        self.clear()
+        self.write(new_text, align = "center", font = font)
 
-
-    class Tile(turtle.Turtle):
-        def __init__(self, y):
-            turtle.Turtle.__init__(self)
-            self.penup()
-            self.goto(random.choice(possible_x), y)
-            self.shape("square")
-            self.shapesize(10, 5, 0.1)
-            self.color("black")
-            self.speed(0)
-        
-        def reset(self):
-            self.goto(random.choice(possible_x), y)
-
-
+def play_game():
+    wn.clear()
+    wn.tracer(0)
     # scoreboard
-    scoreboard = turtle.Turtle()
-    scoreboard.hideturtle()
-    scoreboard.color("red")
-    scoreboard.speed(0)
-    scoreboard.penup()
-    scoreboard.goto(0, 350)
-    scoreboard.write(f"Score: {score} Lives: {int(lives)}", align = "center", font = font)
-
+    scoreboard = Text("red", 0, 350, f"Score: {score} Lives: {int(lives)}", 20)
 
     # grids
     grid1 = Grid(-100, 0)
@@ -107,26 +88,25 @@ def game():
     horizontal_grids = (grid4, grid5, grid6, grid7)
     for grid in horizontal_grids:
         grid.horizontal()
-    
-    
+
+
     # tiles
     tile1 = Tile(-300)
     tile2 = Tile(-100)
     tile3 = Tile(100)
     tile4 = Tile(300)
-    
+
     tiles = [tile1, tile2, tile3, tile4]
-    
-    
+
+
     # functions
     def update_scoreboard():
-        scoreboard.clear()
-        scoreboard.write(f"Score: {score} Lives: {int(lives)}", align = "center", font = font)
-    
+        scoreboard.updatetext(f"Score: {score} Lives: {int(lives)}", 20)
+
     def move_down():
         for tile in tiles:
             tile.sety(tile.ycor() - 200)
-    
+
     def move(key):
         global score
         global lives
@@ -141,11 +121,11 @@ def game():
                 break
             else:
                 lives -= 0.25
-                game_over()
                 update_scoreboard()
+                game_over()
         wn.update()
-    
-    
+
+
     # keybinding
     wn.listen()
     wn.onkeypress((lambda:move(q)), "q")
@@ -153,27 +133,34 @@ def game():
     wn.onkeypress((lambda:move(e)), "e")
     wn.onkeypress((lambda:move(r)), "r")
     
-    
-    # check life
-    def game_over():
-        global score
-        global lives
-        
-        if lives == 0.0:
-            if score > pickle.load(open("highscore.dat", "rb")):
-                pickle.dump(score, open("highscore.dat", "wb"))
-            score = 0
-            lives = 5
-            
-            wn.clearscreen()
-            
-            
-            wn.bye()
-            open_splashscreen()
-    
-    
     # mainloop
     wn.update()
     wn.mainloop()
 
-open_splashscreen()
+def splash_screen():
+    wn.clear()
+    wn.tracer(0)
+        
+    splash_title = Text("black", 0, 250, "Piano Tiles", 50)
+    highscore = Text("black", 0, 100, f"Highest Score: {pickle.load(open('highscore.dat', 'rb'))}", 20)
+    text = Text("black", 0, 50, "Press SPACE to play", 20)
+    
+    wn.listen()
+    wn.onkeypress(play_game, "space")
+
+
+# game over
+def game_over():
+    global score
+    global lives
+    
+    if lives == 0.0:
+        if score > pickle.load(open("highscore.dat", "rb")):
+            pickle.dump(score, open("highscore.dat", "wb"))
+        score = 0
+        lives = 5
+        
+        splash_screen()
+
+splash_screen()
+wn.mainloop()

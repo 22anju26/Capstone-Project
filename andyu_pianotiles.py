@@ -2,14 +2,14 @@
 import turtle
 import random
 import pickle
+import os
 
-# turtle game window setup
+# window setup
 wn = turtle.Screen()
 wn.title("Piano Tiles")
 wn.bgcolor("white")
 wn.setup(410,800)
 wn.tracer(0)
-
 
 # initial stuff
 possible_x = (-150, -50, 50, 150)
@@ -21,8 +21,7 @@ r = 150, -300
 score = 0
 lives = 5
 
-
-# class
+# classes
 class Grid(turtle.Turtle):
     def __init__(self, x, y):
         turtle.Turtle.__init__(self)
@@ -67,6 +66,7 @@ class Text(turtle.Turtle):
         self.clear()
         self.write(new_text, align = "center", font = font)
 
+# main functions
 def play_game():
     wn.clear()
     wn.tracer(0)
@@ -110,8 +110,12 @@ def play_game():
     def move(key):
         global score
         global lives
+        keys = {q:"C", w:"D", e:"E", r:"F"}
         for tile in tiles:
             if tile.pos() == key:
+                for _ in keys:
+                    if key == _:
+                        os.system(f"afplay {keys[_]}.mp3&")
                 score += 10
                 tile.goto(random.choice(possible_x), 300)
                 tiles.remove(tile)
@@ -142,14 +146,18 @@ def splash_screen():
     wn.tracer(0)
         
     splash_title = Text("black", 0, 250, "Piano Tiles", 50)
-    highscore = Text("black", 0, 100, f"Highest Score: {pickle.load(open('highscore.dat', 'rb'))}", 20)
+    try:
+        highscore = Text("black", 0, 100, f"Highest Score: {pickle.load(open('highscore.dat', 'rb'))}", 20)
+        lastscore = Text("black", 0, 150, f"Last Score: {pickle.load(open('lastscore.dat', 'rb'))}", 20)
+    except:
+        highscore = Text("black", 0, 100, "Highest Score: 0", 20)
+        lastscore = Text("black", 0, 150, "Last Score: 0", 20)        
+    
     text = Text("black", 0, 50, "Press SPACE to play", 20)
     
     wn.listen()
     wn.onkeypress(play_game, "space")
 
-
-# game over
 def game_over():
     global score
     global lives
@@ -157,10 +165,12 @@ def game_over():
     if lives == 0.0:
         if score > pickle.load(open("highscore.dat", "rb")):
             pickle.dump(score, open("highscore.dat", "wb"))
+        pickle.dump(score, open("lastscore.dat", "wb"))
         score = 0
         lives = 5
         
         splash_screen()
 
+# main loop
 splash_screen()
 wn.mainloop()
